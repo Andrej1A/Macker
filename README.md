@@ -16,15 +16,15 @@ Macker helps enforce architectural rules (layering, tiering, modularity, etc) in
 2. Install [Apache Maven](https://maven.apache.org)
  * [Maven Tutorial for Mac](https://www.mkyong.com/maven/install-maven-on-mac-osx/)
 3. Clone this repository
- ```bash
+ ```
 git clone git@github.com:Andrej1A/Macker-Original.git
  ```
 4. Change to the directory of the basic example
- ```bash
+ ```
 cd macker/doc/example/basic
  ```
 5. Execute ant
- ```bash
+ ```
 ant
  ```
 6. You will see the following output

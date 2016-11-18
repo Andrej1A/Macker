@@ -27,9 +27,9 @@ cd macker/doc/example/basic
  ```bash
 ant
  ```
-6. You will see the following output:
+6. You will see the following output
 
- ```
+```
 Buildfile: /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/doc/example/basic/build.xml
 
 prepare:

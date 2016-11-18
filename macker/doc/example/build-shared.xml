@@ -1,0 +1,90 @@
+    <property name="src.dir"              location="${basedir}/doc/example/${ant.project.name}/src" />
+    <property name="lib.dir"              location="${basedir}/lib" />
+    <property name="macker.jar.file"      location="${basedir}/build/macker.jar" />
+
+    <property name="build.dir"            location="${basedir}/build/example/${ant.project.name}" />
+    <property name="build.classes.dir"    location="${build.dir}/classes" />
+
+    <property name="macker.report.dir"    location="${build.dir}/report" />
+    <property name="macker.report.xml"    location="${macker.report.dir}/macker-report.xml" />
+    <property name="macker.report.html"   location="${macker.report.dir}/macker-report.html" />
+    
+    <target name="prepare">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${build.classes.dir}" />
+
+        <path id="build.classpath">
+            <fileset dir="${lib.dir}" includes="*.jar" />
+            <pathelement location="${macker.jar.file}" />
+        </path>
+        
+        <available property="macker.jar.file.exists" file="${macker.jar.file}" />
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac 
+            srcdir="${src.dir}"
+            destdir="${build.classes.dir}">
+            <classpath refid="build.classpath" />
+        </javac>        
+    </target>
+    
+    <target name="build-macker-jar" depends="prepare" unless="macker.jar.file.exists">
+        <ant dir="${basedir}"
+            target="jar"
+            inheritAll="false" />
+    </target>
+
+    <target name="macker-report-init">
+        <property name="macker.failOnError" value="false" />
+    </target>
+
+    <!-- You can use these two Ant targets as examples for your own build files: -->
+    <target name="macker" depends="build-macker-jar,compile,explain">
+
+        <property name="macker.verbose" value="false" />
+        <property name="macker.failOnError" value="true" />
+        
+        <mkdir dir="${macker.report.dir}" />
+        
+        <!-- Defines the macker ant task.  You need this once per build file. -->
+        <!-- The classpath here tells Ant where to look for Macker classes. -->
+        <taskdef name="macker"
+            classname="net.innig.macker.ant.MackerAntTask"
+            classpathref="build.classpath"/>  
+        
+        <macker verbose="${macker.verbose}" xmlReportFile="${macker.report.xml}" failOnError="${macker.failOnError}">
+            <!-- Rules come from this file: -->
+            <rules dir="${src.dir}" includes="macker.xml" />
+
+            <!-- Macker will apply those rules to these classes: -->
+            <classes dir="${build.classes.dir}">
+                <include name="**/*.class" />
+            </classes>
+
+            <!-- The primary classes depend on classes in this classpath: -->
+            <classpath refid="build.classpath" />
+        </macker>
+        
+    </target>
+
+    <target name="macker-report" depends="macker-report-init,macker">
+
+        <!-- Defines the macker-report ant task.  You need this once per build file. -->
+        <!-- The classpath here tells Ant where to look for Macker classes. -->
+        <taskdef name="macker-report"
+            classname="net.innig.macker.ant.MackerReportAntTask"
+            classpathref="build.classpath"/>  
+        
+        <macker-report
+            xmlReportfile="${macker.report.xml}"
+            outputFile="${macker.report.html}" />
+        
+        <echo>Macker report: ${macker.report.html}</echo>
+    </target>
+    <!--====================================================================-->
+
+    <target name="clean" description="Removes all build files">
+        <delete dir="${build.classes.dir}" />
+        <delete dir="${build.dir}" />
+    </target>

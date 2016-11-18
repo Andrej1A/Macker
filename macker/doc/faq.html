@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<title>Macker: FAQ</title>
+<style type="text/css">@import "macker.css";</style>
+<meta name="keywords" content="java,architecture,architectural,modularity,modules,layering,layers,tier,tiers,tiering,build,junit,ant,rules,build,utility">
+<meta name="description" content="A build-time architectural rule checker.  Helps maintain consistent layering and modularity by checking references between classes against a user-specified rules file. Runs from Ant, JUnit, or a shell script. [GPL]">
+<meta name="generator" content="Paul">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+<h1>Macker</h1>
+
+<div class="navbar">
+<a href="index.html">Home</a> | 
+<a href="faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="guide/index.html">Guide&nbsp;&amp;&nbsp;Examples</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge</a> |
+<a href="contact.html">Contact</a>
+</div>
+
+<h2>FAQ</h2>
+
+<ul class="pagecontents">
+<li> <a href="#whatis">What is Macker?</a>
+<li> <a href="#goodfor">What is Macker good for?</a>
+<li> <a href="#notgoodfor">What is Macker <i>not</i> good for?</a>
+<li> <a href="#capabilities">What sorts of rules can Macker check?</a>
+<li> <a href="#similar">How is Macker like / unlike similar products?</a>
+<li> <a href="#license">How is Macker licensed?</a>
+<li> <a href="#status">What is its status?  Is it ready for real-world use?</a>
+<li> <a href="#download">Where do I get it?</a>
+<li> <a href="#instructions">How do I use it?</a>
+<li> <a href="#example">Are there examples?</a>
+<li> <a href="#help">Where can I get help using Macker?</a>
+<li> <a href="#contribute">Can I contribute to the project?</a>
+<li> <a href="#name">What does the name "Macker" mean?</a>
+<li> <a href="#who">Who wrote Macker?</a>
+</ul>
+
+<h3><a name="whatis">What is Macker?</a></h3>
+<p>
+Macker is a Java developers' utility which checks classes against user-defined structural rules.  It's meant to model the architectural ideals programmers always dream up for their projects, and then break -- it helps keep code clean and consistent.  You can use it to check general "good practice" rules, and you can also tailor a rules file to suit a specific project's structure.
+<p>
+Macker operates on compiled Java classes.  It usually runs in your build process just after javac, but you could also make it part of your unit testing or packaging process if you like.  It is available as an Ant task and as a command-line utility, both of which read an XML rules file format.  It also has some Java APIs which you can use directly, though they will not be guaranteed stable until the 1.0 release.
+
+<h3><a name="goodfor">What is Macker good for?</a></h3>
+<p>
+Macker is a nice sanity check to keep your code matching all those boxes and arrows on the whiteboard, and prevent the architectural theory from unraveling in practice.  It gives developers immediate feedback when they break conventions, and drives little mistakes and big architectural issues out into the open.  When architectural rules don't work, the problem prompts a group discussion instead of an obscure hack.
+<p>
+If you're designing for a project with a large number of developers, Macker is a great way to keep architectural principles from being diluted after release in the wild.  All those people who weren't in on that discussion at the whiteboard, and thus don't necessarily have the whole picture in their head, will get a helpful nudge in the right direction when they go astray.
+
+<h3><a name="notgoodfor">What is Macker <i>not</i> good for?</a></h3>
+<p>
+Macker is not for class security.  Java's native access modifiers provide guarantees about information visibility and state integrity -- private members are guaranteed to be private, unless a class chooses to expose them.  Java can do this because "private" is not only enforced by the compiler, but by the JVM itself.
+Because Macker is not part of the Java language, it can provide no such guarantees.  It is a sanity check, not a security check.  (You might use Macker as part of a security audit process, but that's a different question.)
+<p>
+Macker is not a substitute for first-class Java language constructs like access control and strong typing.  A good object model should use the language to represent and reinforce its architectural intent, Macker or no.
+<p>
+Macker is not meant to enforce nit-picky code formatting conventions, and obviously can't enforce aesthetic standards like "use conceptually clear names".
+<p>
+Finally, Macker isn't good if you don't want to specify your own architectural rules.  It is not a lint checker, and does not proscribe any general rules for everyone; rather, it helps you stay consistent with the particular rules you came up with for your project.  You might eventually build up a "general practices" rules file which you use across projects, but that's up to you!
+
+<h3><a name="capabilities">What sorts of rules can Macker check?</a></h3>
+<p>
+Macker allows you to specify broad access rules that Java's native access modifiers can't.  The current version supports class- and package-level access rules, such as:
+<ul>
+<li> Classes in the UI layer may not directly access the data object layer, or use classes in java.sql.
+<li> External systems may not access internal implementation classes (suffixed with 'Impl').
+<li> One functional module may access another only through its API.
+<li> Only classes implementing interfaces in javax.ejb, and certain framework packages, may use the EJB APIs.
+</ul>
+<p>
+(All of these are all just examples.  Macker doesn't check anything by default; it's up to you to write rules to fit what you're doing.)
+<p>
+Future versions will support more sophisticated matching class matching, existence/nonexistence rules in addition to access rules, and possibly rules applying at the method as well the class level.  This would allow rules such as:
+<ul>
+<li> Classes implementing the SessionBean interface must have the suffix 'EJB'.
+<li> Methods should take and return Java collections interfaces (e.g. List) instead of concrete types (e.g. ArrayList).
+<li> Objects implementing a certain interface should have static factory methods instead of public constructors.
+</ul>
+
+<h3><a name="similar">How is Macker like / unlike similar products?</a></h3>
+<p>
+There are several lint checkers and style checkers available for Java, such as <a href="http://checkstyle.sourceforge.net/">Checkstyle</a> and <a href="http://jcsc.sourceforge.net/">JCSC</a>, which verify that code adheres to formatting, naming, and style conventions.  (The nascent project <a href="http://sourceforge.net/projects/testpattern/">TestPattern</a> also seems to belong in this category.)  These projects also sometimes flag potential errors (such as empty catch blocks), a task which <a href="http://pmd.sourceforge.net/">PMD</a> and <a href="http://artho.com/jlint/">Jlint</a> are specially designed for.
+<p>
+Macker is, for the most part, complementary to these tools: they operate on source code, and deal with line-by-line implementation details, typically in a peephole fashion; Macker operates on compiled classes, taken all at once, and focuses on large-scale structure.  Macker can't catch misnamed local variables, misplaced braces, or empty catch blocks; conversely, these other tools aren't very good for expressing and checking architecture-level code structure.
+Putting it differently, these other tools live in the realm of the <a href="http://java.sun.com/docs/codeconv/html/CodeConvTOC.doc.html">Java coding conventions</a>, and Macker lives in the realm of the <a href="http://java.sun.com/blueprints/">Java Blueprints</a>. This is why Macker's rules files must be entirely project-specific -- there is no single "Java architecture".
+<p>
+At the time of this writing (August 2003), the only other projects we're aware of that fits the same niche as Macker are <a href="http://www.digitalcompulsion.com/space/aDarwin">aDarwin</a> and <a href="http://patterntesting.sourceforge.net/">PatternTesting</a>.  ADarwin's intent sounds similar, if not identical.  It is a younger project, but quite promising.  PatternTesting's online documentation is a bit thin -- it appears to be built on top of AspectJ, and use aspects to declare rules.  Intriguing!
+
+<h3><a name="status">What is its status?  Is it ready for real-world use?</a></h3>
+<p>
+Macker is quite stable, and reasonably bug-free.  It's certainly suitable for real-world use.
+<p>
+The reason for the pre-1.0 version number is that there are still some fairly serious feature gaps.  For example, you can only currently apply access rules to classes, and not methods.
+<p>
+So basically, you'll find that Macker doesn't do everything you want -- but what it does do, it does well.
+
+<h3><a name="license">How is Macker licensed?</a></h3>
+<p>
+Macker is available under the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  This license allows you to freely use and redistribute Macker, and to bundle it with other software.
+<p>
+If you make changes to Macker or extend it, and you choose to distribute those changes, you must license them under the GPL.  It would be marvelous if you submit your patches back to the Macker project for possible inclusion in future versions.
+
+<h3><a name="download">Where do I get it?</a></h3>
+<p>
+You can download binaries, source code, and this documentation from the <a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Macker download page</a>, hosted by the good folks at <a href="http://sourceforge.net">Sourceforge</a>.
+
+<h3><a name="instructions">How do I use it?</a></h3>
+<p>
+Very briefly:
+<ul>
+<li> Download Macker.
+<li> Write a rules file (like <a href="example/layering/src/macker.xml">this one</a>, for example).
+<li> Add macker to your Ant build.xml, your makefile, or your IDE's list of external tasks -- or just run it from the command line.
+</ul>
+<p>
+See the <a href="guide/index.html">guide</a> for the juicy details.
+
+<h3><a name="example">Are there examples?</a></h3>
+<p>
+<a href="example/index.html">Here's a few</a> to get you started.  You'll also find some sprinkled throughout the <a href="guide/index.html">user's guide</a>.
+<p>
+If you have other examples you'd like share with the world, <a href="contact.html">send them along</a>!
+
+<h3><a name="help">Where can I get help using Macker?</a></h3>
+<p>
+Subscribe to the <a href="http://lists.sourceforge.net/lists/listinfo/macker-user">user mailing list</a>.  It's not terribly high-traffic, and questions generally get answered quickly.
+
+<h3><a name="contribute">Can I contribute to the project?</a></h3>
+<p>
+Yes please! There are <i>always</i> open tasks in need of <b>developers</b>.  It's also important not to underestimate the importance of bug reports and feature suggestions from <b>users</b> -- if you don't tell us, we won't know.  Finally, Macker needs <b>evangelists</b> -- so mention it to your programmer friends, work it into your own projects, write an article on it, spread the word!
+<p>
+<a href="contact.html">Contact us</a>.
+
+<h3><a name="name">What does the name "Macker" mean?</a></h3>
+<p>
+It's a reference to Money Puzzle Exchanger, a Neo-Geo arcade game of the two-player puzzle variety, not unlike Bust-a-Move, Super Puzzle Fighter, and Magic Drop. (It is, in the author's opinion, the finest game in the genre.)  Money Puzzle Exchanger has that strange mixture of cuteness and inscrutability that the Japanese have raised to a fine art -- it features cartoon characters with names like "Debtmiser", "Mightdealer", and "Eldylabor".
+<p>
+One of them is "Macker", a rather overexcited fellow in an absurd cape, boots, jumpsuit, and what may be a lava-proof space helmet of some kind:
+<p align="center">
+<IMG SRC="images/macker.png" border=0 width="586" height="232">
+<p>
+Observe on the right his reaction to defeating Everyworker (a far more mature character, who is upset that I set her up to lose just for some stupid screenshot) -- Macker is an exceptionally arrogant fellow, no doubt.
+But clearly something more than his big ego is eating at him.  Macker, shall we say, has issues.
+<p>
+<a name="mad">Why, you may wonder, <i>why does Macker get so mad</i>?</a>
+<p>
+<p align="center">
+<IMG SRC="images/mackerismad.png" border=0 width=527 height=300>
+<p>
+Well, now we know the answer: Macker is mad because you violated your architectural rules.  Aren't you glad that a psychologically unstable anime character cares so much about your code?
+<p>
+The exact cause and nature of Macker's apparent dental problem remain unknown as of this writing.
+<p>
+Thanks to <a href="http://clubby.ducker.org/~i2">Victor</a> for suggesting the name.
+
+
+<h3><a name="who">Who wrote Macker?</a></h3>
+<p>
+<a href="http://innig.net/">Paul Cantrell</a>, with <a href="thanks.html">some help</a>.
+Feel free to <a href="contact.html">contact me</a> with questions, comments, ideas, bug reports, puns, etc.
+
+<div class="footer">
+<div class="navbar">
+<a href="index.html">Home</a> | 
+<a href="faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="guide/index.html">Guide&nbsp;&amp;&nbsp;Examples</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge</a> |
+<a href="contact.html">Contact</a>
+</div>
+</div>
+<p align="right">
+<A href="http://sourceforge.net"><IMG src="http://sourceforge.net/sflogo.php?group_id=55296&src=macker/doc/faq.html" width="88" height="31" border="0" alt="SourceForge Logo"></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://innig.net/?logo"><img border=0 src="http://innig.net/images/innig_3C0000.gif" alt="innig"></a>
+
+</body>
+</html>
+

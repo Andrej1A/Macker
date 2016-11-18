@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<title>Macker Guide: Using Macker with Ant</title>
+<style type="text/css">@import "../macker.css";</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+<h1>Macker Guide</h1>
+
+<div class="navbar">
+<span class="next">Next:</span> <a href="report.html">Generating Reports</a> |
+<a href="index.html">Table of Contents</a>
+<br>
+<a href="../index.html">Home</a> | 
+<a href="../faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge page</a> |
+<a href="../contact.html">Contact</a>
+</div>
+
+<h2>Using Macker with Ant</h2>
+<ul class="pagecontents">
+<li> <a href="#using">Using the Ant Task </a>
+<li> <a href="#paramters">Parameters</a>
+<li> <a href="#nested">Nested Elements</a>
+<ul>
+   <li> <a href="#rules">&lt;rules&gt;</a>
+   <li> <a href="#classes">&lt;classes&gt;</a>
+   <li> <a href="#var">&lt;var&gt;</a>
+   <li> <a href="#classpath">&lt;classpath&gt;</a>
+</ul>
+<li> <a href="#example">An Example</a>
+</ul>
+
+<h3><a name="using">Declaring the Ant Task</a></h3>
+<p>
+Macker runs reasonably cooperatively as an Ant task.  Is is somewhat more cooperative running under Ant 1.5, which resolved a number of difficulties in the handling of classpaths for custom Ant tasks.  The rest of this page presumes Ant 1.5; if you are using an earlier version, you're on your own.
+<p>
+To use the Macker Ant task, you first need to declare it in a taskdef:
+<pre>&lt;taskdef name="macker"
+    classname="net.innig.macker.ant.MackerAntTask"
+    classpath="<span class="comment">macker.jar and macker libs</span>"/&gt;</pre>
+<p>
+Specifying the classpath can be tedious, since Macker requires so many jars.  Fortunately, Ant provides a nice trick for this: you can use a pattern to grab all the macker jars at once, and then place a classpathref in the taskdef tag -- like so:
+<pre>&lt;path id="macker.classpath"&gt;
+    &lt;fileset dir="<span class="comment">dir with macker.jar and Macker libs</span>" /&gt;
+&lt;/path&gt;
+&lt;taskdef name="macker"
+    classname="net.innig.macker.ant.MackerAntTask"
+    classpathref="macker.classpath"/&gt;</pre>
+<p>
+Once you've declared the macker task, you can use it in your Ant file with the options below.
+
+<h3>Parameters</h3>
+<p>
+These options appear on the &lt;macker&gt; tag itself.  They are all optional.
+<table class="example-table" cellspacing=0>
+    <tr><th>Attribute</th><th>Description</th><th>Default</th></tr>
+    <tr valign="top">
+        <td class="example">printThreshold</td>
+        <td>Severity of errors / messages Macker will print to the console (one of: debug, info, warning, error).</td>
+        <td>info</td>
+    </tr>
+    <tr valign="top">
+        <td class="example">angerThreshold</td>
+        <td>Severity of error / message which will cause Macker to <a href="../faq.html#mad">get mad</a>, and consider rule checking to have failed (debug, info, warning, error).</td>
+        <td>error</td>
+    </tr>
+    <tr valign="top">
+        <td class="example">failOnError</td>
+        <td>Should Macker getting mad cause the Ant build to fail? (An internal error, such as a malformed rules file, will <i>always</i> cause the build to fail; this setting applies only to rule violations.)</td>
+        <td>yes</td>
+    </tr>
+    <tr valign="top">
+        <td class="example">angerProperty</td>
+        <td>The name of an Ant property to set to "true" if rules checking fails.  Note that this setting is moot if failOnError is true.</td>
+        <td><i>none</i></td>
+    </tr>
+    <tr valign="top">
+        <td class="example"><a name="xmlReport">xmlReportFile</a></td>
+        <td>Output location of an XML report.  You can transform this into whatever form suits you.  A future version of Macker will include a standard HTML transform.</td>
+        <td><i>none</i></td>
+    </tr>
+    <tr valign="top">
+        <td class="example">maxMessages</td>
+        <td>The maximum number of messages and errors Macker should print to the console.</td>
+        <td><i>unlimited</i></td>
+    </tr>
+    <tr valign="top">
+        <td class="example">fork</td>
+        <td>Should Macker run in its own JVM? (The answer is almost always "no".)</td>
+        <td>no</td>
+    </tr>
+    <tr valign="top">
+        <td class="example">verbose</td>
+        <td>Instructs Macker to dump information useful for debugging a rules file, including all references from primary classes, and the primary classes matched by each pattern.</td>
+        <td>no</td>
+    </tr>
+</table>
+
+<h3><a name="nested">Nested Elements</a></h3>
+<h4><a name="rules">&lt;rules&gt;</a></h4>
+<p>
+Specifies XML rules files.  Macker will apply each rules file in the fileset to the primary classes.
+<p>
+This tag uses the standard Ant fileset mechanisms.  An example:
+<pre>&lt;rules dir="${src.dir}" includes="**/*macker*.xml" /&gt;</pre>
+
+<h4><a name="classes">&lt;classes&gt;</a></h4>
+<p>
+Specifies the set of primary class files.  These are only the classes to which Macker's rules actually apply; you don't need to include libraries on which your classes depend.
+<p>
+Note that this tag specifies compiled class files -- not source files, and not jars.
+<p>
+Like <code>&lt;rules&gt;</code>, this tag is a fileset.  It typically won't look too much unlike this:
+<p>
+<pre>&lt;classes dir="${build.classes.dir}"&gt;
+    &lt;include name="**/*.class" /&gt;
+&lt;/classes&gt;
+</pre>
+
+<h4><a name="var">&lt;var&gt;</a></h4>
+<p>
+You can optionally define variables for your rules files to use.  This tag has exactly the <a href="var-foreach.html#var">same syntax</a> in your Ant file as it does in a rules file -- you specify a name and a value attribute.
+<p>
+The Macker task does not automatically pass Ant properties through as Macker variables; you need to do this manually:
+<pre>&lt;var name="base.package" value="${base.package}" /&gt;</pre>
+
+<h4><a name="classpath">&lt;classpath&gt;</a></h4>
+<p>
+Macker will look here for information about other classes referenced by the primary classes (typically third party libraries).
+<p>
+If fork is false, this tag is optional.   However, if you provide no classpath, Macker can infer only the names of external classes, and that's it -- many kinds of rule checking will fail.  In a typical build file, you'll simply pass your build classpath here.  
+<p>
+If fork is true, this tag is required, and must contain (at the very least) macker.jar and all the third party jars Macker depends on.  In a typical build file, you'd pass in both your build classpath and the same Macker classpath you used in the taskdef.
+<p>
+Including the primary classes in this classpath has no effect.
+
+<h3><a name="example">An Example</a></h3>
+<p>
+Here, for your copy-and-pasting enjoyment, is a not entirely unreasonable starting point for your own Macker files.
+<p>
+<pre><span class="comment">&lt;!-- Declare a catch-all classpath for the project, its libs, and Macker --&gt;</span>
+&lt;path id="build.classpath"&gt;
+    &lt;pathelement location="${build.classes.dir}" /&gt;
+&lt;/path&gt;
+&lt;path id="macker.classpath"&gt;
+    &lt;pathelement location="${build.classes.dir}" /&gt;
+    &lt;fileset dir="${lib.dir}" includes="*.jar" /&gt;
+    &lt;fileset dir="${macker.lib.dir}" includes="*.jar" /&gt;
+&lt;/path&gt;
+
+<span class="comment">&lt;!-- Declare the Macker task --&gt;</span>
+&lt;taskdef name="macker"
+    classname="net.innig.macker.ant.MackerAntTask"
+    classpathref="macker.classpath" /&gt;
+
+<span class="comment">&lt;!-- Run the darn thing! --&gt;</span>
+&lt;macker&gt;
+    &lt;rules dir="${src.dir}" includes="**/*macker*.xml" /&gt;
+    &lt;classes dir="${build.classes.dir}"&gt;
+        &lt;include name="**/*.class" /&gt;
+    &lt;/classes&gt;
+    &lt;var name="basepkg" value="com.foobar" /&gt;
+    &lt;classpath refid="build.classpath" /&gt;
+&lt;/macker&gt;</pre>
+<p>
+You can also take a look at the <a href="../example/build-shared.xml">example build file</a>.
+
+<div class="next">
+Next: <a href="report.html">Generating Reports</a>
+</div>
+
+<div class="footer">
+<div class="navbar">
+<span class="next">Next:</span> <a href="report.html">Generating Reports</a> |
+<a href="index.html">Table of Contents</a>
+<br>
+<a href="../index.html">Home</a> | 
+<a href="../faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge page</a> |
+<a href="../contact.html">Contact</a>
+</div>
+</div>
+<p align="right">
+<A href="http://sourceforge.net"><IMG src="http://sourceforge.net/sflogo.php?group_id=55296&src=macker/doc/guide/ant.html" width="88" height="31" border="0" alt="SourceForge Logo"></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://innig.net/?logo"><img border=0 src="http://innig.net/images/innig_3C0000.gif" alt="innig"></a>
+
+</body>
+</html>
+

@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<title>Macker Guide: Basic Example</title>
+<style type="text/css">@import "../macker.css";</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+<h1>Macker Guide</h1>
+
+<div class="navbar">
+<span class="next">Next:</span> <a href="regex.html">Regular Expressions</a> |
+<a href="index.html">Table of Contents</a>
+<br>
+<a href="../index.html">Home</a> | 
+<a href="../faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge page</a> |
+<a href="../contact.html">Contact</a>
+</div>
+
+<h2>Basic Example</h2>
+<ul class="pagecontents">
+<li> <a href="#rules">A Simple (and Absurd) Rules File</a>
+<li> <a href="#running">Running the Example</a>
+<li> <a href="#output">The Example's Output</a>
+</ul>
+
+<h3><a name="rules">A Simple (and Absurd) Rules File</a></h3>
+<p>
+Here is a very simple Macker rules file:
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;macker&gt;    
+    &lt;ruleset name="Simple example"&gt;
+        &lt;access-rule&gt;
+            &lt;deny&gt;
+                &lt;from class="**Print*" /&gt;
+                &lt;to class="java.**" /&gt;
+            &lt;/deny&gt;
+        &lt;/access-rule&gt;
+    &lt;/ruleset&gt;
+&lt;/macker&gt;</pre>
+<p>
+The <code>&lt;macker&gt;</code> tag encloses a whole rules file. The <code>&lt;ruleset&gt;</code> groups related rules.  An <code>&lt;access-rule&gt;</code> governs which classes may refer to other classes; it can contain <code>&lt;deny&gt;</code> and <code>&lt;allow&gt;</code> rules. The deny rule above says that any class whose name contains  "Print" may not reference any of the core Java classes. (It's a rather absurd rule, but illustrative.)
+
+<h3><a name="running">Running the Example</a></h3>
+<p>
+You'll typically run Macker from within Ant, something like this:
+<p>
+<pre>&lt;target name="macker" depends="compile"&gt;
+
+    <span class="comment">&lt;!-- Defines the macker ant task.  You need this once per build file. --&gt;
+    &lt;!-- The classpath here tells Ant where to look for the Macker Ant task. --&gt;</span>
+    &lt;taskdef name="macker"
+        classname="net.innig.macker.ant.MackerAntTask"
+        classpathref="build.classpath"/&gt;  
+    
+    &lt;macker&gt;
+        <span class="comment">&lt;!-- This classpath tells Macker where to look for its own --&gt;
+        &lt;!-- libraries, and the libraries used by the primary classes. --&gt;</span>
+        &lt;classpath refid="build.classpath" /&gt;
+
+        <span class="comment">&lt;!-- Rules come from this file: --&gt;</span>
+        &lt;rules dir="${src.dir}" includes="macker.xml" /&gt;
+
+        <span class="comment">&lt;!-- Macker will apply those rules to these primary classes: --&gt;</span>
+        &lt;classes dir="${build.classes.dir}"&gt;
+            &lt;include name="**/*.class" /&gt;
+        &lt;/classes&gt;
+    &lt;/macker&gt;
+    
+&lt;/target&gt;</pre>
+<p>
+(See the full working Ant targets at <a href="../example/build-shared.xml"><code>doc/example/build-shared.xml</code></a>.  You'll need version 1.5 or newer of Ant; get it from the <a href="http://jakarta.apache.org/ant/index.html">Ant site</a>.)
+<p>
+If you are on a UNIX system (or at least have a Bourne shell), you can also use macker from the command line:
+<pre><span class="comment"><i>macker-home</i></span>/bin/macker -r <span class="comment"><i>rulefile</i></span>.xml <span class="comment"><i>SomeJavaClass</i></span>.class <span class="comment">...</span></pre>
+<p>
+(If somebody would like to write a good .bat file to do the same thing the shell script does, <a href="../contact.html">send it to me</a> and I'll include it.)
+<p>
+Macker requires Java 1.3.1 or newer, and the following libraries:
+<ul class="compact">
+<li> <code>innig-util.jar</code> <span class="moreinfo">(<a href="http://innig.net/util/">?</a>)</span>
+<li> <code>jakarta-regexp.jar</code> <span class="moreinfo">(<a href="http://jakarta.apache.org/regexp/">?</a>)</span> 1.2
+<li> <code>bcel.jar</code> <span class="moreinfo">(<a href="http://jakarta.apache.org/bcel/">?</a>)</span> 5.1
+<li> <code>jdom.jar</code> <span class="moreinfo">(<a href="http://jdom.org/">?</a>)</span> b9
+<li> <code>jaxp.jar</code>  <span class="moreinfo">(<a href="http://java.sun.com/xml/jaxp/">?</a>)</span> (included in Java 1.4+)
+<li> a JAXP-compliant XML parser (the Macker distro includes <a href="http://xml.apache.org/xerces2-j/index.html">Xerces</a>)
+</ul>
+<p>
+All these libraries are included in the <code>lib/</code> directory of the Macker distribution.
+The shell script version picks up the libs automatically, as long as you don't move them or the script.  For the Ant task, you'll need to include them in the classpath when you run Macker.
+
+<h3><a name="output">The Example's Output</a></h3>
+<p>
+If we tell Macker to apply the absurd rule above to the following Java class...
+</p>
+<pre>public class PrintHelloWorld
+    {
+    public static void main(String[] args)
+        { System.out.println("Hello world, as they say!"); }
+    }</pre>
+<p>
+...we will get the following response:
+</p>
+<pre>Checking ruleset: Simple example ...
+
+Illegal reference
+  from PrintHelloWorld
+    to java.io.PrintStream
+
+Illegal reference
+  from PrintHelloWorld
+    to java.lang.Object
+
+Illegal reference
+  from PrintHelloWorld
+    to java.lang.System</pre>
+<p>
+Note that Macker picked up not only <code>HelloWorld</code>'s access of <code>java.lang.System</code>, but also two less obvious accesses: <code>HelloWorld</code> implicitly extends <code>java.lang.Object</code>, and also makes use of <code>java.io.PrintStream</code> by calling its <code>println()</code> method.  Macker will pick up a number of accesses not immediately apparent to the naked eye.
+<p>
+Note also that Macker did <i>not</i> get mad about any of the references from <code>java.io.PrintStream</code> to other java utilities, even though its name contains "Print", and our rule would apply.  Macker only applies rules to the primary classes you specify, not to every class it can find in your classpath. (See the <a href="accessrule.html#subset">Access Rules</a> section.)
+
+<div class="next">
+Next: <a href="regex.html">Regular Expressions</a>
+</div>
+
+<div class="footer">
+<div class="navbar">
+<span class="next">Next:</span> <a href="regex.html">Regular Expressions</a> |
+<a href="index.html">Table of Contents</a>
+<br>
+<a href="../index.html">Home</a> | 
+<a href="../faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge page</a> |
+<a href="../contact.html">Contact</a>
+</div>
+</div>
+<p align="right">
+<A href="http://sourceforge.net"><IMG src="http://sourceforge.net/sflogo.php?group_id=55296&src=macker/doc/guide/basic.html" width="88" height="31" border="0" alt="SourceForge Logo"></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://innig.net/?logo"><img border=0 src="http://innig.net/images/innig_3C0000.gif" alt="innig"></a>
+
+</body>
+</html>
+

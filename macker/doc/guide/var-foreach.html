@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<title>Macker Guide: Variables and For Each</title>
+<style type="text/css">@import "../macker.css";</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+<h1>Macker Guide</h1>
+
+<div class="navbar">
+<span class="next">Next:</span> <a href="filter.html">Filters</a> |
+<a href="index.html">Table of Contents</a>
+<br>
+<a href="../index.html">Home</a> | 
+<a href="../faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge page</a> |
+<a href="../contact.html">Contact</a>
+</div>
+
+<h2>Variables and For Each</h2>
+<ul class="pagecontents">
+<li> <a href="#var">Variables</a>
+<li> <a href="#message">Messages</a>
+<li> <a href="#foreach">For Each</a>
+</ul>
+
+<h3><a name="var">Variables</a></h3>
+<p>
+If a certain string appears often in your regular expressions, you can assign it to a variable.  A variable declaration has a very simple syntax:
+<pre>&lt;var name="<span class="comment">var-name</span>" value="<span class="comment">string</span>" /&gt;</pre>
+<p>
+You can refer to a variable in any pattern or message using a shell-style syntax:
+<pre>${<span class="comment">var-name</span>}</pre>
+<p>
+For example, you could define a variable for your application's base package, then use it in your patterns:
+<pre>&lt;var name="app-base" value="com.foobar.whatsitproject" /&gt;
+&lt;pattern name="ui" class="${app-base}.ui.**" /&gt;
+&lt;pattern name="db" class="${app-base}.db.**" /&gt;
+</pre>
+<p>
+As with patterns, the scope of a variable is the ruleset or foreach element which contains it.
+(You can also define a global variable when you call Macker; see the <a href="ant.html">Ant task</a> docs.)
+<p>
+An access rule defines six special variables, which you can use in patterns in the access rule, and in its message. 
+<table class="example-table" cellspacing=0>
+<tr valign="top">
+<td class="example">${from}</td>
+<td>The name of the class matching &lt;from&gt;, without the package name</td>
+</tr>
+<tr valign="top">
+<td class="example">${to}</td>
+<td>The name of the class matching &lt;to&gt;, without the package name</td>
+</tr>
+<tr valign="top">
+<td class="example">${from-package}</td>
+<td>The package name of the &lt;from&gt; class</td>
+</tr>
+<tr valign="top">
+<td class="example">${to-package}</td>
+<td>The package name of the &lt;to&gt; class</td>
+</tr>
+<tr valign="top">
+<td class="example">${from-full}</td>
+<td>The fully qualified (including the package) name of the &lt;from&gt; class</td>
+</tr>
+<tr valign="top">
+<td class="example">${to-full}</td>
+<td>The fully qualified (including the package) name of the &lt;to&gt; class</td>
+</tr>
+</table>
+</p>
+<p>
+
+
+<h3><a name="message">Messages</a></h3>
+<p>
+You can print arbitrary messages during the execution of a rules file.
+</p>
+<pre>&lt;message&gt;<span class="comment">message text</span>&lt;/message&gt;</pre>
+<p>
+Messages may contain variables.
+</p>
+<pre>&lt;message&gt;Commencing error checking for ${base.package}...&lt;/message&gt;</pre>
+<p>
+Messages are actually a kind of rule, and like access rules, they have severities.  The severity of a message is <code>info</code> by default.  You can use the <code>debug</code> severity to hide a message during normal execution, which makes messages useful for tracing variable values:
+</p>
+<pre>&lt;message severity="debug"&gt;var1=${var1} var2=${var2}&lt;/message&gt;</pre>
+<p>
+You can even make a message cause rule checking to fail by using the <code>error</code> severity, if that really seems useful to you.
+</p>
+
+
+<h3><a name="foreach">For Each</a></h3>
+<p>
+Astute observers will note that, up to this point, patterns and rules always apply to "any X" -- it is possible to say things like "any logic class may access any data object", but not to say "any logic class may access <i>its own</i> data object".  The Macker foreach construct provides a way of doing this.
+<p>
+The <code>&lt;foreach&gt;</code> tag iterates a variable over all the matches of a given pattern in the names of the primary classes and their direct dependencies.  The tag takes a variable name and a class regex, which may optionally contain a set of parentheses.
+</p>
+<pre>&lt;foreach var="<span class="comment">var-name</span>" class="<span class="comment">var-value</span>)" /&gt;
+&lt;foreach var="<span class="comment">var-name</span>" class="<span class="comment">...</span>(<span class="comment">var-value</span>)<span class="comment">...</span>" /&gt;</pre>
+<p>
+For the matching classes, the variable will iterate over the substrings falling inside the parentheses.  If the foreach matches several different classes for which the parentheses enclose the same substring, that substring only appears once.  If there are no parentheses, the variable will iterate over the full names of the matching classes.
+<p>
+Confusing?  Some examples should make it a bit clearer.
+<table class="example-table" cellspacing=0>
+<tr><th>A foreach with this regex...</th><th>...applied to these primary classes...</th><th>...will iterate through these values.</th></tr>
+<tr valign="top">
+<td class="example">**Exception</td>
+<td>com.foobar.Thinger
+<br>com.foobar.IllegalThingerException
+<br>com.foobar.NoSuchThingerException</td>
+<td>com.foobar.IllegalThingerException
+<br>com.foobar.NoSuchThingerException</td>
+</tr>
+<tr valign="top">
+<td class="example">(**)Exception</td>
+<td>com.foobar.Thinger
+<br>com.foobar.IllegalThingerException
+<br>com.foobar.NoSuchThingerException</td>
+<td>com.foobar.IllegalThinger
+<br>com.foobar.NoSuchThinger</td>
+</tr>
+<tr valign="top">
+<td class="example">**.(*Exception)</td>
+<td>com.foobar.Thinger
+<br>com.foobar.IllegalThingerException
+<br>com.foobar.NoSuchThingerException</td>
+<td>IllegalThingerException
+<br>NoSuchThingerException</td>
+</tr>
+<tr valign="top">
+<td class="example">(**).*Thinger</td>
+<td>com.foobar.Thinger
+<br>com.foobar.limb.ArmThinger
+<br>com.foobar.limb.LegThinger
+<br>com.foobar.limb.TentacleThinger
+<br>com.foobar.mood.HappyThinger
+<br>com.foobar.mood.SadThinger</td>
+<td>com.foobar
+<br>com.foobar.limb
+<br>com.foobar.mood</td>
+</tr>
+</table>
+<p>
+Remember that a regex always matches <i>the entire name of the class</i>.  This can give confusing results -- be careful!
+
+<table class="example-table" cellspacing=0>
+<tr><th>A foreach with this regex...</th><th>...applied to these primary classes...</th><th>...will iterate through these values.</th></tr>
+<tr valign="top">
+<td class="example">com.foobar.*
+<br><span class="comment">(One might expect this pattern to match each subpackage of com.foobar, but it doesn't -- it needs to match the <b>full</b> class names.)</span></td>
+<td>com.foobar.Thinger
+<br>com.foobar.limb.ArmThinger
+<br>com.foobar.limb.LegThinger
+<br>com.foobar.limb.TentacleThinger
+<br>com.foobar.mood.HappyThinger
+<br>com.foobar.mood.SadThinger</td>
+<td>com.foobar.Thinger</td>
+</tr>
+<tr valign="top">
+<td class="example">(com.foobar**).*
+<br><span class="comment">(This pattern gives just the package names. It matches the full class names, but leaves the class part outside the parentheses.)</span></td>
+<td>com.foobar.Thinger
+<br>com.foobar.limb.ArmThinger
+<br>com.foobar.limb.LegThinger
+<br>com.foobar.limb.TentacleThinger
+<br>com.foobar.mood.HappyThinger
+<br>com.foobar.mood.SadThinger</td>
+<td>com.foobar
+<br>com.foobar.limb
+<br>com.foobar.mood</td>
+</tr>
+<tr valign="top">
+<td class="example">(com.foobar.**).*
+<br><span class="comment">(The extra dot rules out com.foobar.Thinger.)</span></td>
+<td>com.foobar.Thinger
+<br>com.foobar.limb.ArmThinger
+<br>com.foobar.limb.LegThinger
+<br>com.foobar.limb.TentacleThinger
+<br>com.foobar.mood.HappyThinger
+<br>com.foobar.mood.SadThinger</td>
+<td>com.foobar.limb
+<br>com.foobar.mood</td>
+</tr>
+</table>
+<p>
+Foreach is a powerful construct.  Here, for example, is one possible implementation of the example from the FAQ, "One functional module may access another only through its API."
+In this hypothetical situation, the application has a set of modules in packages named <code>com.foobar.module.<i>xyz</i></code>, with implementation classes in subpackages.
+<pre>&lt;ruleset&gt;
+    &lt;var name="base-pkg" value="com.foobar" /&gt;
+    &lt;foreach var="module" class="(${base-pkg}.module.*).**"&gt;
+
+        &lt;pattern name="api" class="${module}.*" /&gt;
+        &lt;pattern name="inside" class="${module}.**" /&gt;
+        &lt;pattern name="outside"&gt;
+            &lt;exclude pattern name="inside" /&gt;
+        &lt;/pattern&gt;
+
+        &lt;access-rule&gt;
+            &lt;message&gt;${from} must access the module ${module} through its API&lt;/message&gt;
+            &lt;deny&gt;
+                &lt;from pattern="outside" /&gt;
+                &lt;to pattern="inside" /&gt;
+                &lt;allow&gt;
+                    &lt;to pattern="api" /&gt;
+                &lt;/allow&gt;
+            &lt;/deny&gt;
+        &lt;/access-rule&gt;
+
+    &lt;/foreach&gt;
+&lt;/ruleset&gt;</pre>
+<p>
+If you understand this example, you have the mystery of the Macker rules file in hand.
+
+
+<div class="next">
+Next: <a href="filter.html">Filters</a>
+</div>
+
+<div class="footer">
+<div class="navbar">
+<span class="next">Next:</span> <a href="filter.html">Filters</a> |
+<a href="index.html">Table of Contents</a>
+<br>
+<a href="../index.html">Home</a> | 
+<a href="../faq.html">FAQ</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=55296">Download</a> |
+<a href="http://sourceforge.net/projects/macker">Sourceforge page</a> |
+<a href="../contact.html">Contact</a>
+</div>
+</div>
+<p align="right">
+<A href="http://sourceforge.net"><IMG src="http://sourceforge.net/sflogo.php?group_id=55296&src=macker/doc/guide/var-foreach.html" width="88" height="31" border="0" alt="SourceForge Logo"></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://innig.net/?logo"><img border=0 src="http://innig.net/images/innig_3C0000.gif" alt="innig"></a>
+
+</body>
+</html>
+

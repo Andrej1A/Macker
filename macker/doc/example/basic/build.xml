@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE DOCUMENT [<!ENTITY stdbuild SYSTEM "../build-shared.xml">]>
+
+<project name="basic" default="macker" basedir="../../..">
+    &stdbuild;
+
+    <target name="explain">
+        <echo>
+________________________________________________________________________________
+
+This stupidly simple example disallows references from classes whose names
+contain "Print" to any Java APIs.  As with most of these examples, the source
+code contains a few violations of the rules, so you can see what such violations
+will look like.  Note that Macker picks up several references in this example
+that aren't immediately obvious.
+
+With all of these examples, you can:
+  * Type "ant" to see macker apply the rules
+  * Type "ant -Dmacker.verbose=true" to see some details of what's going on
+  * Edit "src/macker.xml" to fool with different rules
+  * View an XML report in:
+    ${build.dir}/macker-report.xml
+  
+Enjoy!
+________________________________________________________________________________
+        </echo>
+    </target>
+</project>

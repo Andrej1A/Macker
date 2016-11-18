@@ -13,28 +13,23 @@ Macker helps enforce architectural rules (layering, tiering, modularity, etc) in
 
 1. Install [Apache Ant](http://ant.apache.org)
   * [Ant Tutorial for Mac](http://www.mkyong.com/ant/how-to-apache-ant-on-mac-os-x/)
-
 2. Install [Apache Maven](https://maven.apache.org)
  * [Maven Tutorial for Mac](https://www.mkyong.com/maven/install-maven-on-mac-osx/)
-
 3. Clone this repository
  ```bash
 git clone git@github.com:Andrej1A/Macker-Original.git
  ```
-
 4. Change to the directory of the basic example
  ```bash
 cd macker/doc/example/basic
  ```
-
 5. Execute ant
-```bash
+ ```bash
 ant
-```
+ ```
+6. You will see the following output:
 
-6. You will seee the following output:
-
-```
+ ```
 Buildfile: /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/doc/example/basic/build.xml
 
 prepare:

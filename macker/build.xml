@@ -12,6 +12,7 @@
     <property name="name"                 value="macker" />
     
 	<property name="jdk.home"              location="/Library/Java/JavaVirtualMachines/jdk1.7.0_65.jdk" />
+	<property name="jdk.lib"              location="/Library/Java/JavaVirtualMachines/jdk1.7.0_65.jdk/Contents/Home/lib" />
 	
     <property name="src.dir"              location="${basedir}/src" />
     <property name="res.dir"              location="${basedir}/res" />
@@ -64,6 +65,7 @@
         <property name="run.classpath" refid="run.classpath" />
 
         <path id="test.classpath">
+			<fileset dir="${jdk.lib}" />
             <pathelement location="${build.test.dir}" />
             <path refid="run.classpath" />
         </path>
@@ -201,12 +203,27 @@
         
         <mkdir dir="${build.test.dir}" />
 
+		<javac includeantruntime="false"
+				srcdir="${test.dir}"
+		         destdir="${build.test.dir}"
+		         debug="on"
+				 fork="yes"
+				 bootclasspath="${jdk.home}/Contents/Home/jre/lib/rt.jar"
+				 verbose="false"
+		         source="1.7"
+				 target="1.7">
+			 <classpath refid="test.classpath" />
+		 </javac>
+		<!--
         <javamake
             srcdir="${test.dir}"
             destdir="${build.test.dir}"
             pdbFilename="${build.dir}/${name}-test.pdb">
             <classpath refid="test.classpath" />
         </javamake>
+		-->
+		
+		
     </target>
     
     <target name="test"

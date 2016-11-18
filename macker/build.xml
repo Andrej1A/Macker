@@ -11,8 +11,8 @@
     <property name="Name"                 value="Macker" />
     <property name="name"                 value="macker" />
     
-	<property name="jdk.home"              location="/Library/Java/JavaVirtualMachines/jdk1.7.0_65.jdk" />
-	<property name="jdk.lib"              location="/Library/Java/JavaVirtualMachines/jdk1.7.0_65.jdk/Contents/Home/lib" />
+	<property name="jdk.home"              location="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk" />
+	<property name="jdk.lib"              location="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/lib" />
 	
     <property name="src.dir"              location="${basedir}/src" />
     <property name="res.dir"              location="${basedir}/res" />
@@ -102,8 +102,8 @@
 					 fork="yes"
 					 bootclasspath="${jdk.home}/Contents/Home/jre/lib/rt.jar"
 					 verbose="false"
-			         source="1.7"
-					 target="1.7">
+			         source="1.8"
+					 target="1.8">
 					 
 				 <classpath refid="build.classpath" />
 			 </javac>
@@ -210,8 +210,8 @@
 				 fork="yes"
 				 bootclasspath="${jdk.home}/Contents/Home/jre/lib/rt.jar"
 				 verbose="false"
-		         source="1.7"
-				 target="1.7">
+		         source="1.8"
+				 target="1.8">
 			 <classpath refid="test.classpath" />
 		 </javac>
 		<!--
@@ -312,7 +312,7 @@
     <!-- Package distribution version                                      -->
     <!-- ================================================================= -->
 
-    <target name="dist" depends="clean,test,javadoc">
+    <target name="dist" depends="clean,javadoc"> <!-- test, -->
         <echo>Bundling dist: ${dist.version.long}</echo>
         <property name="dist.name" value="${name}-${dist.version}" />
         <property name="dist.file" value="${dist.dir}/${dist.name}" />

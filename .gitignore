@@ -6,6 +6,7 @@ build
 
 # generated files
 /macker/target/*
+/maker/build/*
 
 #Default gitignore for java projects
 *.class

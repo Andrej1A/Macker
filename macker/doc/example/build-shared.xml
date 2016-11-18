@@ -43,7 +43,7 @@
     <target name="macker" depends="build-macker-jar,compile,explain">
 
         <property name="macker.verbose" value="false" />
-        <property name="macker.failOnError" value="true" />
+        <property name="macker.failOnError" value="false" />
         
         <mkdir dir="${macker.report.dir}" />
         

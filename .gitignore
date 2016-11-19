@@ -1,6 +1,3 @@
-#Standalone example
-!usage_example/standalone/basic/lib/
-
 #from old .cvsignore
 build
 *.pbproj
@@ -76,4 +73,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+
+!/Users/andrej/Documents/workspaceJava2016/Macker/macker/lib/*.jar
+!/Users/andrej/Documents/workspaceJava2016/Macker/macker/lib/**/*.jar
+
+#Standalone example
+!usage_example/standalone/basic/lib/*.jar
 

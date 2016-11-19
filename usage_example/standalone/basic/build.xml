@@ -115,7 +115,7 @@ ________________________________________________________________________________
     <target name="macker-dependency-resolved" depends="macker-check,compile"
       if="macker.rules.file.exists">
       <property name="macker.verbose" value="false" />
-      <property name="macker.failOnError" value="true" />
+      <property name="macker.failOnError" value="false" />
 
       <mkdir dir="${macker.report.dir}" />
 
@@ -141,7 +141,17 @@ ________________________________________________________________________________
 
     <!-- macker-report =================================================== -->
     <target name="macker-report" depends="macker">
+      <!-- Defines the macker-report ant task.  You need this once per build file. -->
+      <!-- The classpath here tells Ant where to look for Macker classes. -->
+      <taskdef name="macker-report"
+          classname="net.innig.macker.ant.MackerReportAntTask"
+          classpathref="build.classpath"/>
 
+      <macker-report
+          xmlReportfile="${macker.report.xml}"
+          outputFile="${macker.report.html}" />
+
+      <echo>Macker report: ${macker.report.html}</echo>
     </target>
 
     <!-- clean =========================================================== -->

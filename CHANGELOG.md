@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+ - Standalone basic example to use Macker with a simpler ant build.xml
+
 ### Changed
  - Replaced javamake with javac in the build.xml of the root folder to make it compilable with Java 1.8.
  - The ´tests´ target in the build.xml of the root folder is temporarily commented out, because there is a compilation error with BCEL.

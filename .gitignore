@@ -1,3 +1,6 @@
+#Standalone example
+!usage_example/standalone/basic/lib/
+
 #from old .cvsignore
 build
 *.pbproj

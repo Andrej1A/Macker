@@ -7,22 +7,26 @@
     <property name="src.dir"              location="${basedir}/src" />
     <property name="lib.dir"              location="${basedir}/lib" />
     <property name="macker.jar.file"      location="${basedir}/lib/macker.jar" />
+    <property name="macker.rules.path"    location="${basedir}/conf/quality/macker" />
+    <property name="macker.rules.file"    location="${macker.rules.path}/macker-rules.xml" />
+    <property name="macker.rules.filepath" location="${macker.rules.path}/${macker.rules.file}" />
 
     <property name="build.dir"            location="${basedir}/build/${ant.project.name}" />
-    <property name="build.classes.dir"    location="${build.dir}/build/classes" />
+    <property name="build.classes.dir"    location="${build.dir}/classes" />
 
-    <property name="macker.report.dir"    location="${build.dir}/build/reports/macker" />
+    <property name="macker.report.dir"    location="${build.dir}/reports/macker" />
     <property name="macker.report.xml"    location="${macker.report.dir}/macker-report.xml" />
     <property name="macker.report.html"   location="${macker.report.dir}/macker-report.html" />
 
     <!-- explain ========================================================= -->
-    <target name="explain">
+    <target name="explain" description="Usage explanation">
         <echo>
 ________________________________________________________________________________
 Simple standalone usage example of Macker. Which shows how to check your
 application for previously defined architectural rules. You can find these
-rules in the macker-rules.xml ${build.dir}/conf/quality/macker/macker-rules.xml)
-file.
+rules in the macker-rules.xml file:
+<![CDATA[${build.dir}/conf/quality/macker/macker-rules.xml]]>
+
 
 Usage:
 ant [tasks]
@@ -65,7 +69,7 @@ ________________________________________________________________________________
     </target>
 
     <!-- prepare ========================================================= -->
-    <target name="prepare">
+    <target name="prepare" description="Creates the build folder.">
       <mkdir dir="${build.dir}" />
       <mkdir dir="${build.classes.dir}" />
 
@@ -73,18 +77,66 @@ ________________________________________________________________________________
           <fileset dir="${lib.dir}" includes="*.jar" />
           <pathelement location="${macker.jar.file}" />
       </path>
-
-      <available property="macker.jar.file.exists" file="${macker.jar.file}" />
     </target>
 
     <!-- compile ========================================================= -->
-    <target name="compile" depends="prepare">
+    <target name="compile"
+      depends="prepare" description="Compiles the basic example.">
+      <javac includeantruntime="false"
+          srcdir="${src.dir}"
+          destdir="${build.classes.dir}">
+          <classpath refid="build.classpath" />
+      </javac>
+    </target>
 
+    <!-- macker-check ==================================================== -->
+    <target name="macker-check">
+      <available property="macker.jar.file.exists"
+        file="${macker.jar.file}" />
+      <available property="macker.rules.file.exists"
+        file="${macker.rules.file}" />
     </target>
 
     <!-- macker ========================================================== -->
-    <target name="macker" depends="compile">
+    <target name="macker" depends="macker-dependency-resolved,macker-dependency-failure,compile">
+      <!-- See the task with name: <macker-ok> -->
+    </target>
 
+    <target name="macker-dependency-failure" depends="macker-check,compile"
+      unless="macker.rules.file.exists">
+      <echo>Macker FAILURE</echo>
+      <echo>Please check if you have the macker.jar and the macker-rules.xml</echo>
+      <echo>at the right path.</echo>
+      <echo>macker.jar path: ${macker.jar.file}</echo>
+      <echo>macker-rules.xml path: ${macker.rules.file}</echo>
+      <fail/>
+    </target>
+
+    <target name="macker-dependency-resolved" depends="macker-check,compile"
+      if="macker.rules.file.exists">
+      <property name="macker.verbose" value="false" />
+      <property name="macker.failOnError" value="true" />
+
+      <mkdir dir="${macker.report.dir}" />
+
+      <!-- Defines the macker ant task.  You need this once per build file. -->
+      <!-- The classpath here tells Ant where to look for Macker classes. -->
+      <taskdef name="macker"
+          classname="net.innig.macker.ant.MackerAntTask"
+          classpathref="build.classpath"/>
+
+      <macker verbose="${macker.verbose}" xmlReportFile="${macker.report.xml}" failOnError="${macker.failOnError}">
+        <!-- Rules come from this file: -->
+        <rules dir="${macker.rules.path}" includes="macker-rules.xml" />
+
+        <!-- Macker will apply those rules to these classes: -->
+        <classes dir="${build.classes.dir}">
+          <include name="**/*.class" />
+        </classes>
+
+        <!-- The primary classes depend on classes in this classpath: -->
+        <classpath refid="build.classpath" />
+      </macker>
     </target>
 
     <!-- macker-report =================================================== -->
@@ -93,7 +145,8 @@ ________________________________________________________________________________
     </target>
 
     <!-- clean =========================================================== -->
-    <target name="clean" description="Removes all build files">
-
+    <target name="clean" description="Removes all build files.">
+      <delete dir="${build.classes.dir}" />
+      <delete dir="${build.dir}" />
     </target>
 </project>

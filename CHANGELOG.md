@@ -6,10 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-###Changed
+### Changed
  - Replaced javamake with javac in the build.xml of the root folder to make it compilable with Java 1.8.
  - The ´tests´ target in the build.xml of the root folder is temporarily commented out, because there is a compilation error with BCEL.
-
 
 ## [0.4.2] - 2003-11-03
  - HTML report formatting with supporting Ant task
@@ -39,7 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - fixed broken links in docs
  - fixed output omission in non-forked ant task
 
-## [version 0.3] - 2002-08-31
+## [0.3] - 2002-08-31
  - Macker now detects API-only accesses of other classes
  - rulesets now support input class subsetting
  - access rules now support custom error messages
@@ -61,7 +60,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [version 0.0]
  - Macker doesn't work
 
-___________________________
+## Notes from the original authors
 
 LIKELY FUTURE FEATURES
 (with wild guesses at version numbers)

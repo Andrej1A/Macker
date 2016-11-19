@@ -7,10 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ###Changed
- - Replaced javamake with javac in the build.xml of the root folder to make it compilable with Java 1.8 from @andrej1a.
-
- ###Note
- - The ´tests´ target in the build.xml of the root folder is temporarily commented out, because there is a compilation error with BCEL from @andrej1a.
+ - Replaced javamake with javac in the build.xml of the root folder to make it compilable with Java 1.8 from @Andrej1A.
+ - The ´tests´ target in the build.xml of the root folder is temporarily commented out, because there is a compilation error with BCEL from @Andrej1A.
 
 
 ## [0.4.2] - 2003-11-03

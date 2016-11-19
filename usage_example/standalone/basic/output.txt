@@ -1,0 +1,58 @@
+Searching for build.xml ...
+Buildfile: /Users/paul/macker/doc/example/basic/build.xml
+
+prepare:
+
+build-macker-jar:
+
+compile:
+
+explain:
+
+________________________________________________________________________________
+
+This stupidly simple example disallows references from classes whose names
+contain "Print" to any Java APIs.  As with most of these examples, the source
+code contains a few violations of the rules, so you can see what such violations
+will look like.  Note that Macker picks up several references in this example
+that aren't immediately obvious.
+
+With all of these examples, you can:
+  * Type "ant" to see macker apply the rules
+  * Type "ant -Dmacker.verbose=true" to see some details of what's going on
+  * Edit "src/macker.xml" to fool with different rules
+  * View an XML report in:
+    /Users/paul/macker/build/example/basic/macker-report.xml
+  
+Enjoy!
+________________________________________________________________________________
+        
+
+macker:
+
+(Checking ruleset: Simple example ...)
+
+Illegal reference
+  from PrintHelloWorld
+    to java.io.PrintStream
+
+Illegal reference
+  from PrintHelloWorld
+    to java.lang.Object
+
+Illegal reference
+  from PrintHelloWorld
+    to java.lang.String
+
+Illegal reference
+  from PrintHelloWorld
+    to java.lang.System
+
+(4 errors)
+
+Macker rules checking failed
+
+BUILD FAILED
+file:/Users/paul/macker/doc/example/build-shared.xml:45: Macker rules checking failed
+
+Total time: 7 seconds

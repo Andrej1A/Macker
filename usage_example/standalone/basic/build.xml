@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<project name="basic" default="explain" basedir=".">
+
+    <!-- Properties ====================================================== -->
+    <!-- Global -->
+    <property name="src.dir"              location="${basedir}/src" />
+    <property name="lib.dir"              location="${basedir}/lib" />
+    <property name="macker.jar.file"      location="${basedir}/lib/macker.jar" />
+
+    <property name="build.dir"            location="${basedir}/build/${ant.project.name}" />
+    <property name="build.classes.dir"    location="${build.dir}/build/classes" />
+
+    <property name="macker.report.dir"    location="${build.dir}/build/reports/macker" />
+    <property name="macker.report.xml"    location="${macker.report.dir}/macker-report.xml" />
+    <property name="macker.report.html"   location="${macker.report.dir}/macker-report.html" />
+
+    <!-- explain ========================================================= -->
+    <target name="explain">
+        <echo>
+________________________________________________________________________________
+Simple standalone usage example of Macker. Which shows how to check your
+application for previously defined architectural rules. You can find these
+rules in the macker-rules.xml ${build.dir}/conf/quality/macker/macker-rules.xml)
+file.
+
+Usage:
+ant [tasks]
+
+tasks:
+  info            Print the explanation of the original basic example.
+  explain         Print this informations
+  prepare         Create necessary folders and template for macker-rules.xml
+                  at the location:
+                  ${build.dir}/conf/quality/macker/macker-rules.xml
+  compile
+  macker
+  macker-report   Creates an report at
+                  ${build.dir}/reports/macker/macker-report.xml
+  clean           Cleanup of all unneccessary previously created files
+________________________________________________________________________________
+      </echo>
+    </target>
+
+    <!-- info ============================================================ -->
+    <target name="info">
+      <echo>
+________________________________________________________________________________
+This stupidly simple example disallows references from classes whose names
+contain "Print" to any Java APIs.  As with most of these examples, the source
+code contains a few violations of the rules, so you can see what such violations
+will look like.  Note that Macker picks up several references in this example
+that aren't immediately obvious.
+
+With all of these examples, you can:
+  * Type "ant" to see macker apply the rules
+  * Type "ant -Dmacker.verbose=true" to see some details of what's going on
+  * Edit "src/macker.xml" to fool with different rules
+  * View an XML report in:
+    ${build.dir}/macker-report.xml
+
+Enjoy!
+________________________________________________________________________________
+        </echo>
+    </target>
+
+    <!-- prepare ========================================================= -->
+    <target name="prepare">
+      <mkdir dir="${build.dir}" />
+      <mkdir dir="${build.classes.dir}" />
+
+      <path id="build.classpath">
+          <fileset dir="${lib.dir}" includes="*.jar" />
+          <pathelement location="${macker.jar.file}" />
+      </path>
+
+      <available property="macker.jar.file.exists" file="${macker.jar.file}" />
+    </target>
+
+    <!-- compile ========================================================= -->
+    <target name="compile" depends="prepare">
+
+    </target>
+
+    <!-- macker ========================================================== -->
+    <target name="macker" depends="compile">
+
+    </target>
+
+    <!-- macker-report =================================================== -->
+    <target name="macker-report" depends="macker">
+
+    </target>
+
+    <!-- clean =========================================================== -->
+    <target name="clean" description="Removes all build files">
+
+    </target>
+</project>

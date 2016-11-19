@@ -17,7 +17,7 @@ Macker helps enforce architectural rules (layering, tiering, modularity, etc) in
  * [Maven Tutorial for Mac](https://www.mkyong.com/maven/install-maven-on-mac-osx/)
 3. Clone this repository
  ```
-git clone git@github.com:Andrej1A/Macker-Original.git
+git clone git@github.com:MackerRuleChecker/Macker.git
  ```
 4. Change to the directory of the basic example
  ```
@@ -30,17 +30,17 @@ ant
 6. You will see the following output
 
 ```
-Buildfile: /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/doc/example/basic/build.xml
+Buildfile: /Users/.../Macker/macker/doc/example/basic/build.xml
 
 prepare:
-    [mkdir] Created dir: /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/build/example/basic
-    [mkdir] Created dir: /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/build/example/basic/classes
+    [mkdir] Created dir: /Users/.../Macker/macker/build/example/basic
+    [mkdir] Created dir: /Users/.../Macker/macker/build/example/basic/classes
 
 build-macker-jar:
 
 compile:
-    [javac] /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/doc/example/build-shared.xml:27: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
-    [javac] Compiling 1 source file to /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/build/example/basic/classes
+    [javac] /Users/.../Macker/macker/doc/example/build-shared.xml:27: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 1 source file to /Users/.../Macker/macker/build/example/basic/classes
 
 explain:
      [echo]
@@ -57,14 +57,14 @@ explain:
      [echo]   * Type "ant -Dmacker.verbose=true" to see some details of what's going on
      [echo]   * Edit "src/macker.xml" to fool with different rules
      [echo]   * View an XML report in:
-     [echo]     /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/build/example/basic/macker-report.xml
+     [echo]     /Users/.../Macker/macker/build/example/basic/macker-report.xml
      [echo]   
      [echo] Enjoy!
      [echo] ________________________________________________________________________________
      [echo]         
 
 macker:
-    [mkdir] Created dir: /Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/build/example/basic/report
+    [mkdir] Created dir: /Users/.../Macker/macker/build/example/basic/report
    [macker]
    [macker] (Checking ruleset: Simple example ...)
    [macker]
@@ -89,7 +89,7 @@ macker:
    [macker] Macker rules checking failed
 
 BUILD FAILED
-/Users/andrej/Documents/workspaceJava2016/Original-Macker-Fork/macker/doc/example/build-shared.xml:56: Macker rules checking failed
+/Users/.../Macker/macker/doc/example/build-shared.xml:56: Macker rules checking failed
 
 Total time: 1 second
 ```
